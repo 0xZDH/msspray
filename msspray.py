@@ -250,6 +250,10 @@ def spray(args, username_list, password_list):
                     print("%s[Found] %s:%s%s" % (text_colors.green, username, password, text_colors.reset))
                     creds[username] = password
 
+                else:
+                    print("%s[Invalid Creds] %s:%s%s" % (text_colors.red, username, password, text_colors.reset))
+                    invalid += 1 # Keep track so the user knows they need to run enum
+
 
         # Check if we are done - this is to avoid the lockout wait period
         # from triggering on the last iteration
@@ -329,12 +333,12 @@ the page to accept a username, check if it is valid, and then accept a password.
 """
 if __name__ == "__main__":
     parser = ArgumentParser(description="MS Online Password Sprayer.")
-    parser.add_argument("-t", "--target", type=str, help="Target URL", required=True)
+    parser.add_argument("-t", "--target",   type=str, help="Target URL", required=True)
     parser.add_argument("-u", "--username", type=str, help="File containing usernames", required=True)
     parser.add_argument("-p", "--password", type=str, help="File containing passwords", required=False)
-    parser.add_argument("--proxy", type=str, help="Proxy to pass traffic through: <ip:port>", required=False)
-    parser.add_argument("--wait", type=int, help="Time to wait when looking for DOM elements (in seconds). Default: 3", default=3, required=False)
-    parser.add_argument("--count", type=int, help="Number of password attempts per user before lockout", required=False)
+    parser.add_argument("--proxy",   type=str, help="Proxy to pass traffic through: <ip:port>", required=False)
+    parser.add_argument("--wait",    type=int, help="Time to wait when looking for DOM elements (in seconds). Default: 3", default=3, required=False)
+    parser.add_argument("--count",   type=int, help="Number of password attempts per user before lockout", required=False)
     parser.add_argument("--lockout", type=float, help="Lockout policy reset time (in minutes)", required=False)
     parser.add_argument("--verbose", action="store_true", help="Verbose output", required=False)
 
