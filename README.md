@@ -7,7 +7,7 @@ https://k3ramas.blogspot.com/2019/04/headless-browsers-for-password-spraying.htm
 ## Setup
 ```bash
 $ pip3 install selenium
-$ wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+$ wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
 $ tar -xvf geckodriver-v0.24.0-linux64.tar.gz
 $ export PATH=$PATH:$(pwd) # Add the current directory with the geckodriver to the PATH
 
