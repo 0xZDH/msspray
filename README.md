@@ -4,11 +4,13 @@ This is a basic username enumeration and password spraying tool aimed at Microso
 
 https://k3ramas.blogspot.com/2019/04/headless-browsers-for-password-spraying.html
 
+> Note: This fails when authentication is redirected to ADFS.
+
 ## Setup
 ```bash
 $ pip3 install selenium
 $ wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
-$ tar -xvf geckodriver-v0.24.0-linux64.tar.gz
+$ tar -xvf geckodriver-v0.26.0-linux64.tar.gz
 $ export PATH=$PATH:$(pwd) # Add the current directory with the geckodriver to the PATH
 
 # Ensure there are no firewall rules that block routing to localhost. 
@@ -24,7 +26,7 @@ Perform username enumeration:<br>
 
 
 ```
-usage: msspray.py [-h] -t TARGET -u USERNAME [-p PASSWORD] [--proxy PROXY]
+usage: msspray.py [-h] [-t TARGET] -u USERNAME [-p PASSWORD] [--proxy PROXY]
                   [--wait WAIT] [--count COUNT] [--lockout LOCKOUT]
                   [--verbose] (-e | -s)
 

