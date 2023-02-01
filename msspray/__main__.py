@@ -227,4 +227,4 @@ def main():
         spray.spray(args)
 
     elapsed = time.time() - start
-    logging.info(f"o365spray executed in {elapsed:.2f} seconds.")
+    logging.info(f"msspray executed in {elapsed:.2f} seconds.")
