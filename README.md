@@ -1,12 +1,12 @@
 # **msspray**
 
-This is a basic username enumeration and password spraying tool aimed at Microsoft Online authentication that renders in the DOM and requires the use of JavaScript to recognize page changes.
-
 > For educational, authorized and/or research purposes only.
 
 See the related blog post: https://k3ramas.blogspot.com/2019/04/headless-browsers-for-password-spraying.html
 
-Currently, there is no concurrency built into the tool. It will run single-threaded.
+This is a basic username enumeration and password spraying tool aimed at Microsoft Online authentication that renders in the DOM and requires the use of JavaScript to recognize page changes.
+
+Currently, there is no concurrency built into the tool - it will run single-threaded.
 
 
 ## Setup
@@ -17,7 +17,14 @@ Currently, there is no concurrency built into the tool. It will run single-threa
 $ pip3 install -r requirements.txt
 ```
 
-2. Install Firefox's `geckodriver`
+2. Install Firefox
+
+```bash
+# Linux
+$ sudo apt install firefox-esr
+```
+
+3. Install Firefox's `geckodriver`
 
 ```bash
 $ wget https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz
@@ -91,4 +98,57 @@ Misc. Configuration:
   --verbose             Verbose output
 
   --debug               Debug output
+```
+
+
+## Alternate Target Handling
+
+While this tool by default targets Microsoft, functionality can be updated for different targets. The [ELEMENTS](msspray/utils/firefox.py#L26) data structure contains the XPATH elements of each input field, button, and error label during the authentication process. This process, if updated for a different target, expects the following authentiaction flow:
+
+1. The first page upon browsing to the provided target renders a username input field and a "next" button
+  - If the username is invalid, a "user error" label is added to the DOM
+2. Once the "next" button is clicked, a second page renders the password input field and the "login" button
+  - If the credentials are invalid, an "invalid credentials" label is added to the DOM
+
+Each elements value (XPATH or CSS_SELECTOR) in the authentication flow can be identified by:
+
+1. Right click the input field, button, or label and select `Inspect`
+2. When the Inspector loads, right-click the highlighted HTML element and select:
+  - `Copy -> XPath`
+  - `Copy -> CSS Selector`
+
+Below is an example, with descriptions, of the `ELEMENTS` data structure that is to be updated for alternate targets. If any values are exempt (e.g. "work"), set the value to:
+- `//*[@id="IGNORE_EXEMPT_FIELD"]` if using type "XPATH"
+- `.IGNORE_EXEMPT_FIELD` if using type "CSS_SELECTOR"
+
+```python
+# Current defaults set for Microsoft
+ELEMENTS = {
+    # Selenium selector type: XPATH, CSS_SELECTOR
+    "type":      "XPATH",
+
+    # Username input field XPATH value
+    "username":  '//*[@id="i0116"]',
+
+    # Password input field XPATH value
+    "password":  '//*[@id="i0118"]',
+
+    # Next button XPATH value
+    "next":      '//*[@id="idSIButton9"]',
+
+    # Login button XPATH value
+    "login":     '//*[@id="idSIButton9"]',
+
+    # Invalid user error label XPATH value
+    "usererror": '//*[@id="usernameError"]',
+
+    # Invalid credentials error label XPATH value
+    "passerror": '//*[@id="passwordError"]',
+
+    # Locked account error label XPATH value
+    "locked":    '//*[@id="idTD_Error"]',
+
+    # Microsoft's Work/Personal selection XPATH value
+    "work":      '//*[@id="aadTile"]',
+}
 ```

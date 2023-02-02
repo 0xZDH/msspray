@@ -18,7 +18,7 @@ from msspray.utils import (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description=f"DOM-Based Enumeration and Password Sprayer - v{__version__}"
+        description=f"Microsoft DOM-Based Enumeration and Password Sprayer - v{__version__}"
     )
 
     action_args = parser.add_argument_group(title="Actions")
