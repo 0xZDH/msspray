@@ -106,16 +106,16 @@ Misc. Configuration:
 While this tool by default targets Microsoft, functionality can be updated for different targets. The [ELEMENTS](msspray/utils/firefox.py#L26) data structure contains the XPATH elements of each input field, button, and error label during the authentication process. This process, if updated for a different target, expects the following authentiaction flow:
 
 1. The first page upon browsing to the provided target renders a username input field and a "next" button
-  - If the username is invalid, a "user error" label is added to the DOM
+    - If the username is invalid, a "user error" label is added to the DOM
 2. Once the "next" button is clicked, a second page renders the password input field and the "login" button
-  - If the credentials are invalid, an "invalid credentials" label is added to the DOM
+    - If the credentials are invalid, an "invalid credentials" label is added to the DOM
 
 Each elements value (XPATH or CSS_SELECTOR) in the authentication flow can be identified by:
 
 1. Right click the input field, button, or label and select `Inspect`
 2. When the Inspector loads, right-click the highlighted HTML element and select:
-  - `Copy -> XPath`
-  - `Copy -> CSS Selector`
+    - `Copy -> XPath`
+    - `Copy -> CSS Selector`
 
 Below is an example, with descriptions, of the `ELEMENTS` data structure that is to be updated for alternate targets. If any values are exempt (e.g. "work"), set the value to:
 - `//*[@id="IGNORE_EXEMPT_FIELD"]` if using type "XPATH"
