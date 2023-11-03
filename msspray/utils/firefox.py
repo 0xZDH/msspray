@@ -20,23 +20,6 @@ from selenium.webdriver.support.ui import (  # type: ignore
 )
 
 
-# fmt: off
-# Mapping of XPATH elements (Default: Microsoft Login)
-# NOTE: This can be adjusted according to the target
-ELEMENTS = {
-    "type":      "XPATH",
-    "username":  '//*[@id="i0116"]',
-    "password":  '//*[@id="i0118"]',
-    "next":      '//*[@id="idSIButton9"]',
-    "login":     '//*[@id="idSIButton9"]',
-    "usererror": '//*[@id="usernameError"]',
-    "passerror": '//*[@id="passwordError"]',
-    "locked":    '//*[@id="idTD_Error"]',
-    "work":      '//*[@id="aadTile"]',
-}
-# fmt: on
-
-
 class FirefoxEngine:
     """Selenium Firefox Engine"""
 

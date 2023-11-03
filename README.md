@@ -53,7 +53,7 @@ usage: msspray.py [-h] (-e | -s) [-t TARGET]
                   [--sleep [-1, 0-120]] [--jitter [0-100]]
                   [--verbose] [--debug]
 
-Microsoft DOM-Based Enumeration and Password Sprayer - v0.1.0
+Microsoft DOM-Based Enumeration and Password Sprayer - v0.1.1
 
 options:
   -h, --help            show this help message and exit
@@ -103,52 +103,32 @@ Misc. Configuration:
 
 ## Alternate Target Handling
 
-While this tool by default targets Microsoft, functionality can be updated for different targets. The [ELEMENTS](msspray/utils/firefox.py#L26) data structure contains the XPATH elements of each input field, button, and error label during the authentication process. This process, if updated for a different target, expects the following authentiaction flow:
+While this tool by default targets Microsoft, functionality can be updated for different targets. The [Elements](msspray/utils/elements.py#L12) data structure contains the XPATH elements of each input field, button, and error label during the authentication process. This process, if updated for a different target, expects the following authentiaction flow:
 
 1. The first page upon browsing to the provided target renders a username input field and a "next" button
     - If the username is invalid, a "user error" label is added to the DOM
 2. Once the "next" button is clicked, a second page renders the password input field and the "login" button
     - If the credentials are invalid, an "invalid credentials" label is added to the DOM
 
-Each elements value (XPATH or CSS_SELECTOR) in the authentication flow can be identified by:
+Each element is defaulted to using XPATH lookups, but supports any of the following selenium lookup types:
+
+```
+ID
+NAME
+XPATH
+LINK_TEXT
+PARTIAL_LINK_TEXT
+TAG_NAME
+CLASS_NAME
+CSS_SELECTOR
+```
+
+Identify the value for the given type being used, for example to find the XPATH value of a given object:
 
 1. Right click the input field, button, or label and select `Inspect`
-2. When the Inspector loads, right-click the highlighted HTML element and select:
-    - `Copy -> XPath`
-    - `Copy -> CSS Selector`
+2. When the Inspector loads, right-click the highlighted HTML element and select: `Copy -> XPath`
 
-Below is an example, with descriptions, of the `ELEMENTS` data structure that is to be updated for alternate targets. If any values are exempt (e.g. "work"), set the value to:
+**NOTE**: If any values are exempt (e.g. "work"), set the value to:
 - `//*[@id="IGNORE_EXEMPT_FIELD"]` if using type "XPATH"
 - `.IGNORE_EXEMPT_FIELD` if using type "CSS_SELECTOR"
-
-```python
-# Current defaults set for Microsoft
-ELEMENTS = {
-    # Selenium selector type: XPATH, CSS_SELECTOR
-    "type":      "XPATH",
-
-    # Username input field XPATH value
-    "username":  '//*[@id="i0116"]',
-
-    # Password input field XPATH value
-    "password":  '//*[@id="i0118"]',
-
-    # Next button XPATH value
-    "next":      '//*[@id="idSIButton9"]',
-
-    # Login button XPATH value
-    "login":     '//*[@id="idSIButton9"]',
-
-    # Invalid user error label XPATH value
-    "usererror": '//*[@id="usernameError"]',
-
-    # Invalid credentials error label XPATH value
-    "passerror": '//*[@id="passwordError"]',
-
-    # Locked account error label XPATH value
-    "locked":    '//*[@id="idTD_Error"]',
-
-    # Microsoft's Work/Personal selection XPATH value
-    "work":      '//*[@id="aadTile"]',
-}
-```
+- `IGNORE_EXEMPT_FIELD` if using any other type

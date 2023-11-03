@@ -7,6 +7,7 @@ from msspray.utils import (
     firefox,
     utils,
 )
+from msspray.utils.elements import Elements
 from msspray.utils.logger import text_colors
 
 
@@ -46,21 +47,15 @@ def enumerate(args: argparse.Namespace):
 
         # Populate the username field and click 'Next'
         browser.populate_element(
-            browser.find_element(
-                firefox.ELEMENTS["type"], firefox.ELEMENTS["username"]
-            ),
+            browser.find_element(Elements.username.type, Elements.username.value),
             username,
         )
-        browser.click(
-            browser.is_clickable(firefox.ELEMENTS["type"], firefox.ELEMENTS["next"])
-        )
+        browser.click(browser.is_clickable(Elements.next.type, Elements.next.value))
 
         time.sleep(1)  # Ensure the previous DOM is stale
 
         # Handle invalid usernames
-        if browser.find_element(
-            firefox.ELEMENTS["type"], firefox.ELEMENTS["usererror"]
-        ):
+        if browser.find_element(Elements.usererror.type, Elements.usererror.value):
             if args.verbose:
                 print(
                     f"[{text_colors.FAIL}INVALID{text_colors.ENDC}] "
@@ -70,7 +65,7 @@ def enumerate(args: argparse.Namespace):
 
             # Clear the element for next username
             browser.find_element(
-                firefox.ELEMENTS["type"], firefox.ELEMENTS["username"]
+                Elements.username.type, Elements.username.value
             ).clear()
 
         # If no username error, valid username

