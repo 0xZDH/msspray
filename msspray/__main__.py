@@ -110,6 +110,12 @@ def parse_args() -> argparse.Namespace:
 
     misc_args = parser.add_argument_group(title="Misc. Configuration")
     misc_args.add_argument(
+        "--gui",
+        action="store_true",
+        help="Display the browser GUI (Default runs as headless)",
+        required=False,
+    )
+    misc_args.add_argument(
         "--verbose",
         action="store_true",
         help="Verbose output",
@@ -151,6 +157,11 @@ def parse_args() -> argparse.Namespace:
     # Handle sleep randomization
     if args.sleep == -1:
         args.sleep = randint(1, 120)
+
+    # Handle headless browser
+    # GUI boolean will be the opposite value to what headless
+    # should be (e.g. True GUI -> False headless)
+    args.headless = not args.gui
 
     return args
 

@@ -22,7 +22,7 @@ def enumerate(args: argparse.Namespace):
     valid_users = []
     requests = 0
 
-    browser = firefox.FirefoxEngine(wait=args.wait, proxy=args.proxy)
+    browser = firefox.FirefoxEngine(wait=args.wait, proxy=args.proxy, headless=args.headless)
 
     for username in args.username:
         requests += 1
@@ -78,7 +78,7 @@ def enumerate(args: argparse.Namespace):
         # Handle browser resets after every 5 username attempts
         # to deal with latency issues
         if requests == 10:
-            browser = firefox.reset_browser(browser, args.wait, args.proxy)
+            browser = firefox.reset_browser(browser, args.wait, args.proxy, args.headless)
             requests = 0
 
         # Sleep/Jitter to throttle subsequent request attempts

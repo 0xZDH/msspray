@@ -121,13 +121,15 @@ def reset_browser(
     browser: FirefoxEngine,
     wait: int = 3,
     proxy: str = None,
+    headless: bool = True,
 ) -> FirefoxEngine:
     """Reset the browser context for performance
 
     :param browser: current FirefoxEngine object
     :param wait: seconds to wait for a page to load
     :param proxy: http/s proxy
+    :param headless: if the engine should run as headless
     :returns: new FirefoxEngine object
     """
     browser.quit()
-    return FirefoxEngine(wait=wait, proxy=proxy)
+    return FirefoxEngine(wait=wait, proxy=proxy, headless=headless)

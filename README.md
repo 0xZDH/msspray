@@ -53,7 +53,7 @@ usage: msspray.py [-h] (-e | -s) [-t TARGET]
                   [--sleep [-1, 0-120]] [--jitter [0-100]]
                   [--verbose] [--debug]
 
-Microsoft DOM-Based Enumeration and Password Sprayer - v0.1.1
+Microsoft DOM-Based Enumeration and Password Sprayer - v0.1.2
 
 options:
   -h, --help            show this help message and exit
@@ -95,6 +95,8 @@ Scan Configuration:
                         [Default: 0]
 
 Misc. Configuration:
+  --gui                 Display the browser GUI (Default runs as headless)
+
   --verbose             Verbose output
 
   --debug               Debug output
