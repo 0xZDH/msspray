@@ -129,5 +129,5 @@ def reset_browser(
     :param proxy: http/s proxy
     :returns: new FirefoxEngine object
     """
-    browser.close()
+    browser.quit()
     return FirefoxEngine(wait=wait, proxy=proxy)
