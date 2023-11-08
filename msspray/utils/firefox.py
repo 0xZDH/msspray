@@ -1,18 +1,14 @@
-from selenium.common.exceptions import (  # type: ignore
-    TimeoutException,
-    WebDriverException,
-)
+import re
+import shutil
+
+from selenium.common.exceptions import TimeoutException  # type: ignore
 from selenium.webdriver import (  # type: ignore
     Firefox,
     FirefoxProfile,
-    DesiredCapabilities,
 )
 from selenium.webdriver.common.by import By  # type: ignore
-from selenium.webdriver.common.proxy import (  # type: ignore
-    Proxy,
-    ProxyType,
-)
 from selenium.webdriver.firefox.options import Options  # type: ignore
+from selenium.webdriver.firefox.service import Service as FirefoxService  # type: ignore
 from selenium.webdriver.support import expected_conditions as EC  # type: ignore
 from selenium.webdriver.support.ui import (  # type: ignore
     WebDriverWait,
@@ -48,31 +44,29 @@ class FirefoxEngine:
         :param proxy: http/s proxy
         :param headless: if the engine should run as headless
         """
-        self.proxy = None if not proxy else self._build_proxy(proxy)
-        self.options.headless = headless
-        self.driver = Firefox(
-            options=self.options,
-            firefox_profile=self.profile,
-            desired_capabilities=self.proxy,
-        )
+        if proxy:
+            proxy = re.sub("^https?:\/\/", "", proxy)  # Remove protocol
+            server, port = proxy.split(":", 1)
+            self.options.set_preference("network.proxy.type", 1)
+            self.options.set_preference("network.proxy.http", server)
+            self.options.set_preference("network.proxy.http_port", int(port))
+            self.options.set_preference("network.proxy.ssl", server)
+            self.options.set_preference("network.proxy.ssl_port", int(port))
+
+        # Grab geckodriver executable path
+        geckodriver = shutil.which("geckodriver")
+        self.service = FirefoxService(executable_path=geckodriver)
+
+        self.options.profile = self.profile
+        if headless:
+            self.options.add_argument("-headless")
+
+        self.driver = Firefox(options=self.options, service=self.service)
+
         # NOTE: Not sure if these help or not with optimization
         self.driver.set_window_position(0, 0)
         self.driver.set_window_size(1024, 768)
         self.wait = WebDriverWait(self.driver, wait)
-
-    def _build_proxy(self, proxy):
-        proxy = Proxy(
-            {
-                "proxyType": ProxyType.MANUAL,
-                "httpProxy": proxy,
-                "ftpProxy": proxy,
-                "sslProxy": proxy,
-                "noProxy": "",
-            }
-        )
-        capabilities = DesiredCapabilities.FIREFOX
-        proxy.add_to_capabilities(capabilities)
-        return capabilities
 
     def quit(self):
         self.driver.quit()
