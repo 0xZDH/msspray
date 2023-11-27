@@ -62,9 +62,15 @@ def parse_args() -> argparse.Namespace:
 
     web_args = parser.add_argument_group(title="Web Configuration")
     web_args.add_argument(
-        "--proxy",
+        "--http-proxy",
         type=str,
-        help="HTTP/S proxy (e.g. http://127.0.0.1:8080)",
+        help="HTTP/S proxy (e.g. http://127.0.0.1:8080 - protocol optional)",
+        required=False,
+    )
+    web_args.add_argument(
+        "--socks-proxy",
+        type=str,
+        help="SOCKS proxy (e.g. 127.0.0.1:8080)",
         required=False,
     )
     web_args.add_argument(

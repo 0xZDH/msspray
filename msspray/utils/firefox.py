@@ -35,23 +35,35 @@ class FirefoxEngine:
     def __init__(
         self,
         wait: int = 3,
-        proxy: str = None,
+        http_proxy: str = None,
+        socks_proxy: str = None,
         headless: bool = True,
     ):
         """Initialize the Firefox Engine
 
         :param wait: seconds to wait for a page to load
-        :param proxy: http/s proxy
+        :param http_proxy: http/s proxy
+        :param socks_proxy: socks proxy
         :param headless: if the engine should run as headless
         """
-        if proxy:
-            proxy = re.sub("^https?:\/\/", "", proxy)  # Remove protocol
-            server, port = proxy.split(":", 1)
+        # Handle proxy
+        if http_proxy or socks_proxy:
             self.options.set_preference("network.proxy.type", 1)
-            self.options.set_preference("network.proxy.http", server)
-            self.options.set_preference("network.proxy.http_port", int(port))
-            self.options.set_preference("network.proxy.ssl", server)
-            self.options.set_preference("network.proxy.ssl_port", int(port))
+
+            # Set HTTP/S proxy
+            if http_proxy:
+                http_proxy = re.sub("^https?:\/\/", "", http_proxy)  # Remove protocol
+                http_server, http_port = http_proxy.split(":", 1)
+                self.options.set_preference("network.proxy.http", http_server)
+                self.options.set_preference("network.proxy.http_port", int(http_port))
+                self.options.set_preference("network.proxy.ssl", http_server)
+                self.options.set_preference("network.proxy.ssl_port", int(http_port))
+
+            # Set SOCKS proxy
+            if socks_proxy:
+                socks_server, socks_port = socks_proxy.split(":", 1)
+                self.options.set_preference("network.proxy.socks", socks_server)
+                self.options.set_preference("network.proxy.socks_port", int(socks_port))
 
         # Grab geckodriver executable path
         geckodriver = shutil.which("geckodriver")
@@ -120,16 +132,23 @@ class FirefoxEngine:
 def reset_browser(
     browser: FirefoxEngine,
     wait: int = 3,
-    proxy: str = None,
+    http_proxy: str = None,
+    socks_proxy: str = None,
     headless: bool = True,
 ) -> FirefoxEngine:
     """Reset the browser context for performance
 
     :param browser: current FirefoxEngine object
     :param wait: seconds to wait for a page to load
-    :param proxy: http/s proxy
+    :param http_proxy: http/s proxy
+    :param socks_proxy: socks proxy
     :param headless: if the engine should run as headless
     :returns: new FirefoxEngine object
     """
     browser.quit()
-    return FirefoxEngine(wait=wait, proxy=proxy, headless=headless)
+    return FirefoxEngine(
+        wait=wait,
+        http_proxy=http_proxy,
+        socks_proxy=socks_proxy,
+        headless=headless
+    )

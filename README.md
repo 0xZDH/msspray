@@ -1,15 +1,17 @@
-# **msspray**
+# msspray
 
 > For educational, authorized and/or research purposes only.
 
 See the related blog post: https://k3ramas.blogspot.com/2019/04/headless-browsers-for-password-spraying.html
 
-This is a basic username enumeration and password spraying tool aimed at Microsoft Online authentication that renders in the DOM and requires the use of JavaScript to recognize page changes.
+Username enumeration and password spraying tool aimed at Microsoft Online authentication by rendering DOM objects through loading the page in a selenium browser.
 
 Currently, there is no concurrency built into the tool - it will run single-threaded.
 
 
 ## Setup
+
+> This tool explicitly uses Firefox in its current form.
 
 1. Install the Python dependencies
 
@@ -27,8 +29,10 @@ $ sudo apt install firefox-esr
 3. Install Firefox's `geckodriver`
 
 ```bash
-$ wget https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz
-$ tar -xvf geckodriver-v0.32.0-linux64.tar.gz
+# Visit https://github.com/mozilla/geckodriver/releases/ for the latest release and other binaries
+# Linux
+$ wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz
+$ tar -xvf geckodriver-v0.33.0-linux64.tar.gz
 $ export PATH=$PATH:$(pwd) # Add the current directory with the geckodriver to the PATH
 ```
 
@@ -46,14 +50,9 @@ Perform password spray:<br>
 `python3 msspray.py -s -t https://login.microsoftonline.com -u usernames.txt -p passwords.txt --count 2 --lockout 5`
 
 ```
-usage: msspray.py [-h] (-e | -s) [-t TARGET]
-                  -u USERNAME [-p PASSWORD]
-                  [--proxy PROXY] [--wait WAIT]
-                  [--count COUNT] [--lockout LOCKOUT]
-                  [--sleep [-1, 0-120]] [--jitter [0-100]]
-                  [--verbose] [--debug]
+usage: msspray.py (-e | -s) [options]
 
-Microsoft DOM-Based Enumeration and Password Sprayer - v0.1.2
+Microsoft DOM-Based Enumeration and Password Sprayer - v0.1.3
 
 options:
   -h, --help            show this help message and exit
@@ -75,7 +74,11 @@ Primary Options:
                         Comma delimited list or file containing passwords
 
 Web Configuration:
-  --proxy PROXY         HTTP/S proxy (e.g. http://127.0.0.1:8080)
+  --http-proxy HTTP_PROXY
+                        HTTP/S proxy (e.g. http://127.0.0.1:8080 - protocol optional)
+
+  --socks-proxy SOCKS_PROXY
+                        SOCKS proxy (e.g. 127.0.0.1:8080)
 
   --wait WAIT           Time to wait when looking for DOM elements (in seconds)
                         [Default: 3]

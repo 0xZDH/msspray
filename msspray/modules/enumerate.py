@@ -22,7 +22,12 @@ def enumerate(args: argparse.Namespace):
     valid_users = []
     requests = 0
 
-    browser = firefox.FirefoxEngine(wait=args.wait, proxy=args.proxy, headless=args.headless)
+    browser = firefox.FirefoxEngine(
+        wait=args.wait,
+        http_proxy=args.http_proxy,
+        socks_proxy=args.socks_proxy,
+        headless=args.headless,
+    )
 
     for username in args.username:
         requests += 1
@@ -78,8 +83,14 @@ def enumerate(args: argparse.Namespace):
         # Handle browser resets after every 5 username attempts
         # to deal with latency issues
         if requests == 10:
-            browser = firefox.reset_browser(browser, args.wait, args.proxy, args.headless)
             requests = 0
+            browser = firefox.reset_browser(
+                browser,
+                args.wait,
+                args.http_proxy,
+                args.socks_proxy,
+                args.headless,
+            )
 
         # Sleep/Jitter to throttle subsequent request attempts
         if args.sleep:
@@ -88,4 +99,11 @@ def enumerate(args: argparse.Namespace):
     # Statistics
     print("\n")
     logging.info(f"Enumeration results saved to: {filename}")
-    logging.info(f"Number of valid users:        {len(valid_users)}")
+    logging.info(f"Number of valid users: {len(valid_users)}")
+
+    # Attempt final clean up
+    try:
+        browser.quit()
+
+    except:
+        pass

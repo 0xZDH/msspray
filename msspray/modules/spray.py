@@ -23,7 +23,12 @@ def spray(args: argparse.Namespace):
     password_count = 0
     requests = 0
 
-    browser = firefox.FirefoxEngine(wait=args.wait, proxy=args.proxy)
+    browser = firefox.FirefoxEngine(
+        wait=args.wait,
+        http_proxy=args.http_proxy,
+        socks_proxy=args.socks_proxy,
+        headless=args.headless,
+    )
 
     for password in args.password:
         password_count += 1
@@ -134,8 +139,14 @@ def spray(args: argparse.Namespace):
             # Handle browser resets after every 5 username attempts
             # to deal with latency issues
             if requests == 5:
-                browser = firefox.reset_browser(browser, args.wait, args.proxy)
                 requests = 0
+                browser = firefox.reset_browser(
+                    browser,
+                    args.wait,
+                    args.http_proxy,
+                    args.socks_proxy,
+                    args.headless,
+                )
 
             # Sleep/Jitter to throttle subsequent request attempts
             if args.sleep:
@@ -149,5 +160,12 @@ def spray(args: argparse.Namespace):
 
     # Statistics
     print("\n")
-    logging.info(f"Spray results saved to:      {filename}")
+    logging.info(f"Spray results saved to: {filename}")
     logging.info(f"Number of valid credentials: {len(valid_creds)}")
+
+    # Attempt final clean up
+    try:
+        browser.quit()
+
+    except:
+        pass
